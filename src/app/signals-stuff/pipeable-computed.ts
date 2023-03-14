@@ -1,19 +1,75 @@
 import { Signal, isSignal } from "@angular/core";
-import { from, Observable, ObservableInput, OperatorFunction } from "rxjs";
+import {
+  from,
+  isObservable,
+  Observable,
+  ObservableInput,
+  OperatorFunction,
+} from "rxjs";
 import { fromObservable } from "./from-observable";
 import { fromSignal } from "./from-signal";
 
 export function computed$<TValue, TReturn = TValue>(
-  source: ObservableInput<TValue> | Signal<TValue>,
+  signal: Signal<TValue>,
   operator: OperatorFunction<TValue, TReturn>
+): Signal<TReturn>;
+export function computed$<TValue, TReturn = TValue>(
+  promise: Promise<TValue>,
+  initialValue: TValue,
+  operator?: OperatorFunction<TValue, TReturn>
+): Signal<TReturn>;
+export function computed$<TValue, TReturn = TValue>(
+  observable: Observable<TValue>,
+  initialValue?: TValue,
+  operator?: OperatorFunction<TValue, TReturn>
+): Signal<TReturn>;
+export function computed$<TValue, TReturn = TValue>(
+  source: ObservableInput<TValue> | Signal<TValue>,
+  initialValueOrOperator?: TValue | OperatorFunction<TValue, TReturn>,
+  operator?: OperatorFunction<TValue, TReturn>
 ): Signal<TReturn> {
-  let $: [Observable<TValue>, TValue?];
+  const [$, op, initialValue] = toPipeableArgs(
+    source,
+    initialValueOrOperator,
+    operator
+  );
 
-  if (typeof source === "function" && isSignal(source)) {
-    $ = [fromSignal(source), source()];
-  } else {
-    $ = [from(source)];
+  if (!op) {
+    return fromObservable($, initialValue) as Signal<TReturn>;
   }
 
-  return fromObservable($[0].pipe(operator), $[1]) as Signal<TReturn>;
+  return fromObservable($.pipe(op), initialValue) as Signal<TReturn>;
+}
+
+function toPipeableArgs<TValue, TReturn = TValue>(
+  source: ObservableInput<TValue> | Signal<TValue>,
+  initialValueOrOperator?: TValue | OperatorFunction<TValue, TReturn>,
+  operator?: OperatorFunction<TValue, TReturn>
+): [Observable<TValue>, OperatorFunction<TValue, TReturn>?, TValue?] {
+  if (typeof source === "function" && isSignal(source)) {
+    return [
+      fromSignal(source),
+      initialValueOrOperator as OperatorFunction<TValue, TReturn>,
+      source(),
+    ];
+  }
+
+  if (
+    source instanceof Promise ||
+    ("then" in source && typeof source["then"] === "function")
+  ) {
+    if (
+      initialValueOrOperator === undefined ||
+      typeof initialValueOrOperator === "function"
+    )
+      throw new Error(`computed$ with Promise expects an initialValue`);
+
+    return [from(source), operator, initialValueOrOperator as TValue];
+  }
+
+  if (isObservable(source)) {
+    return [source, operator, initialValueOrOperator as TValue];
+  }
+
+  return [from(source), operator, initialValueOrOperator as TValue];
 }

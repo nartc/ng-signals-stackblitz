@@ -37,6 +37,6 @@ export class AppComponent {
 
   onInput(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.query.update(() => target.value);
+    this.query.set(target.value);
   }
 }
