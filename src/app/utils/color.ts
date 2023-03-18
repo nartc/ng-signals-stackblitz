@@ -5,6 +5,7 @@ export const initialColors = {
 };
 
 export type Color = keyof typeof initialColors;
+export type ColorComponent = keyof (typeof initialColors)[Color];
 
 export function createBgStyle(rgb: (typeof initialColors)[Color]) {
   return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
