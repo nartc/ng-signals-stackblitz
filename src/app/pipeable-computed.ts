@@ -4,10 +4,10 @@ import { debounceTime, pipe, startWith, switchMap } from "rxjs";
 import { computed$ } from "./signals-stuff/pipeable-computed";
 
 @Component({
-  selector: "app-root",
+  standalone: true,
   template: `
-    <!--The content below is only a placeholder and can be replaced.-->
-    <h1>Experiment Angular Signals misc. APIs</h1>
+    <h3>Github User Search</h3>
+
     <input [value]="query()" (input)="onInput($event)" />
     <ul>
       <li *ngFor="let user of githubUsers()">
@@ -16,11 +16,9 @@ import { computed$ } from "./signals-stuff/pipeable-computed";
       </li>
     </ul>
   `,
-  standalone: true,
   imports: [NgFor],
-  styles: [],
 })
-export class AppComponent {
+export default class PipeableComputed {
   readonly query = signal("");
   readonly githubUsers = computed$(
     this.query,
