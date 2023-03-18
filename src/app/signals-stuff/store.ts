@@ -42,7 +42,7 @@ export function store<TState extends object>(
   initialState: TState
 ): Store<TState> {
   const state = signal(initialState);
-  const computedCache = new Map();
+  const readonlyCache = new Map();
   const signalCache = new Map();
   const storeCache = new Map();
 
@@ -67,8 +67,8 @@ export function store<TState extends object>(
   }
 
   const apply = () => {
-    if (!computedCache.has("__self__")) {
-      computedCache.set(
+    if (!readonlyCache.has("__self__")) {
+      readonlyCache.set(
         "__self__",
         computed(() => {
           const thisState = state();
@@ -82,7 +82,7 @@ export function store<TState extends object>(
         })
       );
     }
-    return computedCache.get("__self__")();
+    return readonlyCache.get("__self__")();
   };
 
   const cleanUp = (injector?: Injector) => {
@@ -91,7 +91,7 @@ export function store<TState extends object>(
     });
     storeCache.clear();
     signalCache.clear();
-    computedCache.clear();
+    readonlyCache.clear();
   };
 
   const destroy = (injector?: Injector) => {
@@ -131,13 +131,10 @@ export function store<TState extends object>(
       }
 
       if (prop in state()) {
-        if (!computedCache.has(prop)) {
-          computedCache.set(
-            prop,
-            computed(() => state()[prop])
-          );
+        if (!readonlyCache.has(prop)) {
+          readonlyCache.set(prop, () => state()[prop]);
         }
-        return computedCache.get(prop)();
+        return readonlyCache.get(prop)();
       }
 
       return Reflect.get(target, p, receiver);

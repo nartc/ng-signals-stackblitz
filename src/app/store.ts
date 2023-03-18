@@ -1,5 +1,5 @@
 import { NgFor, TitleCasePipe } from "@angular/common";
-import { Component, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { store } from "./signals-stuff/store";
 
 const initialColors = {
@@ -63,6 +63,7 @@ const bgStyle = () =>
     </div>
   `,
   imports: [NgFor, TitleCasePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Store {
   readonly bgStyle = bgStyle;
