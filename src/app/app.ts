@@ -8,10 +8,13 @@ import { RouterLink, RouterOutlet } from "@angular/router";
     <h1>Experiment Angular Signals misc. APIs</h1>
     <ul>
       <li>
-        <a routerLink="/pipeable-computed"> Pipeable Computed </a>
+        <a routerLink="/pipeable-computed">Pipeable Computed</a>
       </li>
       <li>
         <a routerLink="/store">Store</a>
+      </li>
+      <li>
+        <a routerLink="/store-rxjs">Store Example w/ RxJS</a>
       </li>
     </ul>
 

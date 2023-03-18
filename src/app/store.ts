@@ -1,21 +1,13 @@
 import { NgFor, TitleCasePipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { store } from "./signals-stuff/store";
-
-const initialColors = {
-  coral: { r: 255, g: 127, b: 80 },
-  darkTurquoise: { r: 0, g: 206, b: 209 },
-  maroon: { r: 128, g: 0, b: 0 },
-};
-
-type Color = keyof typeof initialColors;
+import { Color, createBgStyle, initialColors } from "./utils/color";
 
 const colors = store(initialColors);
 const currentKey = signal<Color>("coral");
 
 const currentColor = () => colors[currentKey()];
-const bgStyle = () =>
-  `rgb(${currentColor().r}, ${currentColor().g}, ${currentColor().b})`;
+const bgStyle = () => createBgStyle(currentColor());
 
 @Component({
   standalone: true,

@@ -10,6 +10,7 @@ bootstrapApplication(AppComponent, {
         loadComponent: () => import("./app/pipeable-computed"),
       },
       { path: "store", loadComponent: () => import("./app/store") },
+      { path: "store-rxjs", loadComponent: () => import("./app/store-rxjs") },
     ]),
   ],
 }).catch((err) => console.error(err));
