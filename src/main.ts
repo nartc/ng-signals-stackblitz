@@ -11,6 +11,10 @@ bootstrapApplication(AppComponent, {
       },
       { path: "store", loadComponent: () => import("./app/store") },
       { path: "store-rxjs", loadComponent: () => import("./app/store-rxjs") },
+      {
+        path: "store-signal",
+        loadComponent: () => import("./app/store-signal"),
+      },
     ]),
   ],
 }).catch((err) => console.error(err));

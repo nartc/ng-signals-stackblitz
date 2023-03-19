@@ -38,6 +38,8 @@ export type Store<TState extends object> = {
 } & StoreSnapshot<TState> &
   Signal<TState>;
 
+const PROPS_TO_SKIP = ["toString"] as const;
+
 export function store<TState extends object>(
   initialState: TState
 ): Store<TState> {
@@ -106,33 +108,31 @@ export function store<TState extends object>(
     cleanUp();
   };
 
-  return new Proxy(state, {
+  return new Proxy(() => {}, {
     get: (target, p, receiver) => {
       const prop = p as keyof TState;
 
-      if (prop === "mutate") {
-        return state.mutate.bind(state);
+      if (
+        PROPS_TO_SKIP.includes(p as any) ||
+        (p as string).includes("__zone_symbol__")
+      ) {
+        return Reflect.get(target, p, receiver);
       }
 
-      if (prop === "update") {
-        return state.update.bind(state);
-      }
+      if (prop === "mutate") return state.mutate.bind(state);
+      if (prop === "update") return state.mutate.bind(state);
+      if (prop === "destroy") return destroy;
 
-      if (prop === "destroy") {
-        return destroy;
-      }
-
-      if (signalCache.has(prop)) {
-        return signalCache.get(prop);
-      }
-
-      if (storeCache.has(prop)) {
-        return storeCache.get(prop);
-      }
+      if (signalCache.has(prop)) return signalCache.get(prop);
+      if (storeCache.has(prop)) return storeCache.get(prop);
+      if (readonlyCache.has(prop)) return readonlyCache.get(prop)();
 
       if (prop in state()) {
         if (!readonlyCache.has(prop)) {
-          readonlyCache.set(prop, () => state()[prop]);
+          readonlyCache.set(
+            prop,
+            computed(() => state()[prop])
+          );
         }
         return readonlyCache.get(prop)();
       }

@@ -1,6 +1,6 @@
-import { NgFor, NgIf, TitleCasePipe } from "@angular/common";
+import { KeyValuePipe, NgFor, NgIf, TitleCasePipe } from "@angular/common";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { Color, ColorComponent, initialColors } from "../utils/color";
+import { Color, ColorComponent, Counts, initialColors } from "../utils/color";
 
 @Component({
   selector: "app-color-editor",
@@ -48,8 +48,43 @@ import { Color, ColorComponent, initialColors } from "../utils/color";
         </label>
       </div>
     </div>
+
+    <table>
+      <tr>
+        <th></th>
+        <th>blue</th>
+        <th>green</th>
+        <th>red</th>
+      </tr>
+      <tr *ngFor="let record of counts | keyvalue">
+        <td>{{ record.key }}</td>
+        <td *ngFor="let countRecord of record.value | keyvalue">
+          {{ countRecord.value }}
+        </td>
+      </tr>
+    </table>
   `,
-  imports: [NgFor, NgIf, TitleCasePipe],
+  imports: [NgFor, NgIf, TitleCasePipe, KeyValuePipe],
+  styles: [
+    `
+      table {
+        font-family: Menlo, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    `,
+  ],
 })
 export class ColorEditor {
   @Input() title = "";
@@ -57,6 +92,7 @@ export class ColorEditor {
   @Input() background = "";
   @Input() currentKey!: Color;
   @Input() currentColor!: (typeof initialColors)[Color];
+  @Input() counts!: Counts;
 
   readonly colorKeys = Object.keys(initialColors) as Color[];
   readonly components: ColorComponent[] = ["r", "g", "b"];

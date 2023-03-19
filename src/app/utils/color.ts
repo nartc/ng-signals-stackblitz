@@ -4,6 +4,13 @@ export const initialColors = {
   maroon: { r: 128, g: 0, b: 0 },
 };
 
+export const initialCounts = {
+  coral: { r: 0, g: 0, b: 0 },
+  darkTurquoise: { r: 0, g: 0, b: 0 },
+  maroon: { r: 0, g: 0, b: 0 },
+};
+
+export type Counts = typeof initialCounts;
 export type Color = keyof typeof initialColors;
 export type ColorComponent = keyof (typeof initialColors)[Color];
 
