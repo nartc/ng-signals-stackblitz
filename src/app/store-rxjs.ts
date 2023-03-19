@@ -6,7 +6,7 @@ import {
   map,
   tap,
   distinctUntilChanged,
-  distinctUntilKeyChanged,
+  combineLatest,
 } from "rxjs";
 import {
   Color,
@@ -17,7 +17,40 @@ import {
 } from "./utils/color";
 import { ColorEditor } from "./ui/color-editor";
 
-const colors$ = new BehaviorSubject(initialColors);
+const coral$ = new BehaviorSubject(initialColors.coral);
+const maroon$ = new BehaviorSubject(initialColors.maroon);
+const darkTurquoise$ = new BehaviorSubject(initialColors.darkTurquoise);
+
+const colors = {
+  maroon: maroon$,
+  darkTurquoise: darkTurquoise$,
+  coral: coral$,
+};
+
+const components = {
+  coral: {
+    r: coral$.pipe(map((color) => color.r)),
+    g: coral$.pipe(map((color) => color.g)),
+    b: coral$.pipe(map((color) => color.b)),
+  },
+  darkTurquoise: {
+    r: darkTurquoise$.pipe(map((color) => color.r)),
+    g: darkTurquoise$.pipe(map((color) => color.g)),
+    b: darkTurquoise$.pipe(map((color) => color.b)),
+  },
+  maroon: {
+    r: maroon$.pipe(map((color) => color.r)),
+    g: maroon$.pipe(map((color) => color.g)),
+    b: maroon$.pipe(map((color) => color.b)),
+  },
+};
+
+const colors$ = combineLatest({
+  maroon: maroon$,
+  darkTurquoise: darkTurquoise$,
+  coral: coral$,
+});
+
 const currentKey$ = new BehaviorSubject<Color>("coral");
 
 const currentColor$ = colors$.pipe(
@@ -37,18 +70,6 @@ const bgStyle$ = currentColor$.pipe(map((color) => createBgStyle(color)));
       (updateCurrent)="currentKey$.next($event)"
       (colorChange)="onInput($event.component, $event.value)"
     />
-
-    <p style="font-style:italic">
-      Requirement: each time we move the slider, we need to increment the count
-      of changes we make to a specific RGB component on the current selected
-      Color
-    </p>
-
-    <p style="font-style:italic">
-      If someone wants to give this a try, feel free to. It's too long for me to
-      bother knowing Signal is so much simpler. Check <code>/store</code> or
-      <code>/store-signal</code> for references
-    </p>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AsyncPipe, ColorEditor],
@@ -60,13 +81,25 @@ export default class StoreRxjs {
   readonly changes$ = new BehaviorSubject(initialCounts);
 
   ngOnInit() {
-    colors$
+    currentKey$
       .pipe(
-        switchMap((colors) =>
-          currentKey$.pipe(
-            map((key) => colors[key].r),
-            distinctUntilChanged(),
-            tap(console.log.bind(console, "current red color -->"))
+        switchMap((key) =>
+          combineLatest(
+            (["r", "g", "b"] as const).map((component) =>
+              components[key][component].pipe(
+                distinctUntilChanged(),
+                tap((color) => {
+                  console.log(`current ${component} color -->`, color);
+                  this.changes$.next({
+                    ...this.changes$.value,
+                    [key]: {
+                      ...this.changes$.value[key],
+                      [component]: this.changes$.value[key][component] + 1,
+                    },
+                  });
+                })
+              )
+            )
           )
         )
       )
@@ -74,13 +107,7 @@ export default class StoreRxjs {
   }
 
   onInput(component: ColorComponent, value: number) {
-    const current = colors$.value;
-    colors$.next({
-      ...current,
-      [currentKey$.value]: {
-        ...current[currentKey$.value],
-        [component]: value,
-      },
-    });
+    const current = colors[currentKey$.value].value;
+    colors[currentKey$.value].next({ ...current, [component]: value });
   }
 }
