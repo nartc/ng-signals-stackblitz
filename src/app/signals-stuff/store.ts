@@ -7,6 +7,7 @@ import {
   SettableSignal,
   signal,
   Signal,
+  untracked,
 } from "@angular/core";
 
 type PrimitiveKeysOnly<TState extends object> = {
@@ -123,11 +124,11 @@ export function store<TState extends object>(
       if (prop === "update") return state.mutate.bind(state);
       if (prop === "destroy") return destroy;
 
+      if (readonlyCache.has(prop)) return readonlyCache.get(prop)();
       if (signalCache.has(prop)) return signalCache.get(prop);
       if (storeCache.has(prop)) return storeCache.get(prop);
-      if (readonlyCache.has(prop)) return readonlyCache.get(prop)();
 
-      if (prop in state()) {
+      if (prop in untracked(state)) {
         if (!readonlyCache.has(prop)) {
           readonlyCache.set(
             prop,

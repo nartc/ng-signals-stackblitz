@@ -33,12 +33,6 @@ const bgStyle = () => createBgStyle(currentColor());
       (updateCurrent)="currentKey.set($event)"
       (colorChange)="onChange($event.component, $event.value)"
     />
-    <p style="font-style:italic">
-      There seems to be a bug with <code>store()</code>. When we change the
-      color of a RGB component the first time, both the other two RGB components
-      get incremented, and only the first time. This doesn't happen with
-      <code>/store-signal</code>
-    </p>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ColorEditor],
@@ -66,6 +60,8 @@ export default class Store {
   }
 
   onChange(component: ColorComponent, value: number) {
-    colors[currentKey()].mutate((s) => (s[component] = value));
+    colors[currentKey()].mutate((s) => {
+      s[component] = value;
+    });
   }
 }
