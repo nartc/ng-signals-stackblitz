@@ -1,4 +1,10 @@
-import { KeyValuePipe, NgFor, NgIf, TitleCasePipe } from "@angular/common";
+import {
+  CommonModule,
+  KeyValuePipe,
+  NgFor,
+  NgIf,
+  TitleCasePipe,
+} from "@angular/common";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { Color, ColorComponent, Counts, initialColors } from "../utils/color";
 
@@ -64,7 +70,7 @@ import { Color, ColorComponent, Counts, initialColors } from "../utils/color";
       </tr>
     </table>
   `,
-  imports: [NgFor, NgIf, TitleCasePipe, KeyValuePipe],
+  imports: [CommonModule],
   styles: [
     `
       table {

@@ -121,7 +121,7 @@ export function store<TState extends object>(
       }
 
       if (prop === "mutate") return state.mutate.bind(state);
-      if (prop === "update") return state.mutate.bind(state);
+      if (prop === "update") return state.update.bind(state);
       if (prop === "destroy") return destroy;
 
       if (readonlyCache.has(prop)) return readonlyCache.get(prop)();
