@@ -27,7 +27,7 @@ export function fromSignal<T>(source: Signal<T>): Observable<T> {
   const observable = new Observable<T>((observer) => {
     const watcher = effect(() => {
       try {
-        observer.next(source());
+        observer.next(source() as T);
       } catch (err) {
         observer.error(err);
       }

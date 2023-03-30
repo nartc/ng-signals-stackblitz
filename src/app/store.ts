@@ -33,17 +33,6 @@ const bgStyle = () => createBgStyle(currentColor());
       (updateCurrent)="currentKey.set($event)"
       (colorChange)="onChange($event.component, $event.value)"
     />
-    <p style="font-style: italic">
-      There's a slight bug with <code>/store</code> and
-      <code>/store-signal</code> that the initial count increments (0 -> 1 in
-      <code>effect()</code>) won't make it to the UI due to Change Detection.
-      This is not the case for <code>/store-rxjs</code> because
-      <code>AsyncPipe</code> does trigger CD.
-    </p>
-    <p style="font-style: italic">
-      We can assume that this will be fixed when Angular Core integrates better
-      with Signals
-    </p>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ColorEditor],
@@ -55,11 +44,12 @@ export default class Store {
 
   readonly changes = injectStore(store(initialCounts));
 
-  ngOnInit() {
+  constructor() {
     effect(() => {
       console.log("current color Red component -->", colors[currentKey()].r);
       this.changes[currentKey()].mutate((s) => (s.r += 1));
     });
+
     effect(() => {
       console.log("current color Green component -->", colors[currentKey()].g);
       this.changes[currentKey()].mutate((s) => (s.g += 1));

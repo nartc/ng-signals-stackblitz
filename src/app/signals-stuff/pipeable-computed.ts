@@ -50,7 +50,7 @@ function toPipeableArgs<TValue, TReturn = TValue>(
     return [
       fromSignal(source),
       initialValueOrOperator as OperatorFunction<TValue, TReturn>,
-      source(),
+      source() as TValue,
     ];
   }
 

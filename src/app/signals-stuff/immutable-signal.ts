@@ -1,8 +1,8 @@
-import { SettableSignal, Signal, signal } from "@angular/core";
+import { WritableSignal, Signal, signal } from "@angular/core";
 
 export function immutableSignal<T>(
   initialValue: T
-): Signal<T> & Omit<SettableSignal<T>, "mutate"> {
+): Signal<T> & Omit<WritableSignal<T>, "mutate"> {
   const state = signal(initialValue);
 
   Object.defineProperty(state, "mutate", {

@@ -4,10 +4,11 @@ import {
   inject,
   Injector,
   runInInjectionContext,
-  SettableSignal,
+  WritableSignal,
   signal,
   Signal,
   untracked,
+  DeepReadonly,
 } from "@angular/core";
 
 type PrimitiveKeysOnly<TState extends object> = {
@@ -26,15 +27,15 @@ type PrimitiveOnly<TState extends object> = Pick<
 
 type StoreSnapshot<TState extends object> = {
   [TKey in keyof TState]: TState[TKey] extends Array<any>
-    ? SettableSignal<TState[TKey]>
+    ? WritableSignal<TState[TKey]>
     : TState[TKey] extends object
     ? Store<TState[TKey]>
     : ReturnType<Signal<TState[TKey]>>;
 };
 
 export type Store<TState extends object> = {
-  mutate: SettableSignal<PrimitiveOnly<TState>>["mutate"];
-  update: SettableSignal<PrimitiveOnly<TState>>["update"];
+  mutate: WritableSignal<PrimitiveOnly<TState>>["mutate"];
+  update: WritableSignal<PrimitiveOnly<TState>>["update"];
   destroy: (injector?: Injector) => void;
 } & StoreSnapshot<TState> &
   Signal<TState>;
@@ -76,10 +77,10 @@ export function store<TState extends object>(
         computed(() => {
           const thisState = state();
           signalCache.forEach((childSignal, key) => {
-            thisState[key as keyof TState] = childSignal();
+            thisState[key as keyof DeepReadonly<TState>] = childSignal();
           });
           storeCache.forEach((childStore, key) => {
-            thisState[key as keyof TState] = childStore();
+            thisState[key as keyof DeepReadonly<TState>] = childStore();
           });
           return thisState;
         })
@@ -111,7 +112,7 @@ export function store<TState extends object>(
 
   return new Proxy(() => {}, {
     get: (target, p, receiver) => {
-      const prop = p as keyof TState;
+      const prop = p as keyof DeepReadonly<TState>;
 
       if (
         PROPS_TO_SKIP.includes(p as any) ||

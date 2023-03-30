@@ -78,7 +78,7 @@ export function fromObservable<T, U = never>(
       case StateKind.Error:
         throw current.error;
     }
-  });
+  }) as Signal<T | U>;
 }
 const enum StateKind {
   NoValue,

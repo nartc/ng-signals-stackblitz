@@ -1,6 +1,7 @@
 import { bootstrapApplication } from "@angular/platform-browser";
 import { provideRouter } from "@angular/router";
 import { AppComponent } from "./app/app";
+import { provideQueryClient } from "./app/signals-stuff/query/provide-query-client";
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -16,5 +17,6 @@ bootstrapApplication(AppComponent, {
         loadComponent: () => import("./app/store-signal"),
       },
     ]),
+    provideQueryClient(),
   ],
 }).catch((err) => console.error(err));

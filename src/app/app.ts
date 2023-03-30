@@ -1,3 +1,4 @@
+import { NgIf } from "@angular/common";
 import { Component } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
 
@@ -24,7 +25,7 @@ import { RouterLink, RouterOutlet } from "@angular/router";
     <router-outlet />
   `,
   standalone: true,
-  imports: [RouterLink, RouterOutlet],
+  imports: [RouterLink, RouterOutlet, NgIf],
   styles: [],
 })
 export class AppComponent {}

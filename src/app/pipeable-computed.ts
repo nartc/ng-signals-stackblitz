@@ -13,10 +13,6 @@ import { computed$ } from "./signals-stuff/pipeable-computed";
   standalone: true,
   template: `
     <h3>Github User Search</h3>
-    <p style="font-style: italic">
-      This example has Data Fetching logic. Hence, we still need to rely on CD
-    </p>
-
     <input [value]="query()" (input)="onInput($event)" />
     <ul>
       <li *ngFor="let user of githubUsers()">
@@ -29,8 +25,6 @@ import { computed$ } from "./signals-stuff/pipeable-computed";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PipeableComputed {
-  private readonly cdr = inject(ChangeDetectorRef);
-
   readonly query = signal("");
   readonly githubUsers = computed$(
     this.query,
@@ -41,8 +35,7 @@ export default class PipeableComputed {
           .then((response) => response.json())
           .then((data) => data.items);
       }),
-      startWith([]),
-      tap(this.cdr.markForCheck.bind(this.cdr))
+      startWith([])
     )
   );
 
