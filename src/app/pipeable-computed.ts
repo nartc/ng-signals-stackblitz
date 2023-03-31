@@ -1,11 +1,5 @@
 import { NgFor } from "@angular/common";
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  signal,
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { debounceTime, pipe, startWith, switchMap, tap } from "rxjs";
 import { computed$ } from "./signals-stuff/pipeable-computed";
 

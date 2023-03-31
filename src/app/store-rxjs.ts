@@ -90,13 +90,6 @@ export default class StoreRxjs {
                 distinctUntilChanged(),
                 tap((color) => {
                   console.log(`current ${component} color -->`, color);
-                  this.changes$.next({
-                    ...this.changes$.value,
-                    [key]: {
-                      ...this.changes$.value[key],
-                      [component]: this.changes$.value[key][component] + 1,
-                    },
-                  });
                 })
               )
             )
@@ -109,5 +102,12 @@ export default class StoreRxjs {
   onInput(component: ColorComponent, value: number) {
     const current = colors[currentKey$.value].value;
     colors[currentKey$.value].next({ ...current, [component]: value });
+    this.changes$.next({
+      ...this.changes$.value,
+      [currentKey$.value]: {
+        ...this.changes$.value[currentKey$.value],
+        [component]: this.changes$.value[currentKey$.value][component] + 1,
+      },
+    });
   }
 }

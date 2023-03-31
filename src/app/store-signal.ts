@@ -71,7 +71,6 @@ export default class StoreSignal {
         "current color Red component -->",
         computedComponents[currentKey()].r()
       );
-      this.changes.mutate((s) => (s[currentKey()].r += 1));
     });
 
     effect(() => {
@@ -79,7 +78,6 @@ export default class StoreSignal {
         "current color Green component -->",
         computedComponents[currentKey()].g()
       );
-      this.changes.mutate((s) => (s[currentKey()].g += 1));
     });
 
     effect(() => {
@@ -87,11 +85,11 @@ export default class StoreSignal {
         "current color Blue component -->",
         computedComponents[currentKey()].b()
       );
-      this.changes.mutate((s) => (s[currentKey()].b += 1));
     });
   }
 
   onChange(component: ColorComponent, value: number) {
     colors.mutate((s) => s[currentKey()].mutate((c) => (c[component] = value)));
+    this.changes.mutate((s) => (s[currentKey()][component] += 1));
   }
 }

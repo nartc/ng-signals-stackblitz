@@ -47,16 +47,13 @@ export default class Store {
   constructor() {
     effect(() => {
       console.log("current color Red component -->", colors[currentKey()].r);
-      this.changes[currentKey()].mutate((s) => (s.r += 1));
     });
 
     effect(() => {
       console.log("current color Green component -->", colors[currentKey()].g);
-      this.changes[currentKey()].mutate((s) => (s.g += 1));
     });
     effect(() => {
       console.log("current color Blue component -->", colors[currentKey()].b);
-      this.changes[currentKey()].mutate((s) => (s.b += 1));
     });
   }
 
@@ -64,5 +61,6 @@ export default class Store {
     colors[currentKey()].mutate((s) => {
       s[component] = value;
     });
+    this.changes[currentKey()].mutate((s) => (s[component] += 1));
   }
 }
