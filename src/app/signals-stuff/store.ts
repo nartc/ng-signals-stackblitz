@@ -8,7 +8,6 @@ import {
   signal,
   Signal,
   untracked,
-  DeepReadonly,
 } from "@angular/core";
 
 type PrimitiveKeysOnly<TState extends object> = {
@@ -77,10 +76,10 @@ export function store<TState extends object>(
         computed(() => {
           const thisState = state();
           signalCache.forEach((childSignal, key) => {
-            thisState[key as keyof DeepReadonly<TState>] = childSignal();
+            thisState[key as keyof TState] = childSignal();
           });
           storeCache.forEach((childStore, key) => {
-            thisState[key as keyof DeepReadonly<TState>] = childStore();
+            thisState[key as keyof TState] = childStore();
           });
           return thisState;
         })
@@ -112,7 +111,7 @@ export function store<TState extends object>(
 
   return new Proxy(() => {}, {
     get: (target, p, receiver) => {
-      const prop = p as keyof DeepReadonly<TState>;
+      const prop = p as keyof TState;
 
       if (
         PROPS_TO_SKIP.includes(p as any) ||
