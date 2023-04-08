@@ -49,26 +49,6 @@ export function store<TState extends object>(
   const signalCache = new Map();
   const storeCache = new Map();
 
-  for (const key in initialState) {
-    const initialValue = initialState[key];
-    if (Array.isArray(initialValue)) {
-      if (!signalCache.has(key)) {
-        signalCache.set(key, signal(initialValue));
-      }
-      continue;
-    }
-
-    if (
-      typeof initialValue === "object" &&
-      typeof initialValue !== "function" &&
-      !(initialValue instanceof Date)
-    ) {
-      if (!storeCache.has(key)) {
-        storeCache.set(key, store(initialValue as object));
-      }
-    }
-  }
-
   const apply = () => {
     if (!readonlyCache.has("__self__")) {
       readonlyCache.set(
@@ -128,7 +108,27 @@ export function store<TState extends object>(
       if (signalCache.has(prop)) return signalCache.get(prop);
       if (storeCache.has(prop)) return storeCache.get(prop);
 
-      if (prop in untracked(state)) {
+      const untrackedState = untracked(state);
+      if (prop in untrackedState) {
+        const val = untrackedState[prop];
+        if (Array.isArray(val)) {
+          if (!signalCache.has(prop)) {
+            signalCache.set(prop, signal(untracked(state)[prop]));
+          }
+          return signalCache.get(prop);
+        }
+
+        if (
+          typeof val === "object" &&
+          typeof val !== "function" &&
+          !(val instanceof Date)
+        ) {
+          if (!storeCache.has(prop)) {
+            storeCache.set(prop, store(val as object));
+          }
+          return storeCache.get(prop);
+        }
+
         if (!readonlyCache.has(prop)) {
           readonlyCache.set(
             prop,
