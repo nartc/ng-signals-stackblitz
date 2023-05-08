@@ -1,5 +1,5 @@
 import { Signal, isSignal } from "@angular/core";
-import { fromSignal, fromObservable } from "@angular/core/rxjs-interop";
+import { toSignal, toObservable } from "@angular/core/rxjs-interop";
 import {
   from,
   isObservable,
@@ -34,10 +34,12 @@ export function computed$<TValue, TReturn = TValue>(
   );
 
   if (!op) {
-    return fromObservable($, initialValue) as Signal<TReturn>;
+    return toSignal($, { initialValue }) as Signal<TReturn>;
   }
 
-  return fromObservable($.pipe(op), initialValue as TReturn) as Signal<TReturn>;
+  return toSignal($.pipe(op), {
+    initialValue: initialValue as TReturn,
+  }) as Signal<TReturn>;
 }
 
 function toPipeableArgs<TValue, TReturn = TValue>(
@@ -47,7 +49,7 @@ function toPipeableArgs<TValue, TReturn = TValue>(
 ): [Observable<TValue>, OperatorFunction<TValue, TReturn>?, TValue?] {
   if (typeof source === "function" && isSignal(source)) {
     return [
-      fromSignal(source),
+      toObservable(source),
       initialValueOrOperator as OperatorFunction<TValue, TReturn>,
       source() as TValue,
     ];

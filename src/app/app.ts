@@ -18,7 +18,7 @@ import { RouterLink, RouterOutlet } from "@angular/router";
         <a routerLink="/store-rxjs">Store Example w/ RxJS</a>
       </li>
       <li>
-        <a routerLink="/store-signal">Store Example w/ Signals</a>
+        <a routerLink="/store-signal">Store Example w/ plain Signals</a>
       </li>
     </ul>
 
